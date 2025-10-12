@@ -1,0 +1,30 @@
+title: Aakashi's Personal Site
+description: Developer | Creator | Tech Enthusiast
+baseurl: ""
+url: "https://Aakashi06.github.io"
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Author information
+author:
+  name: Aakashi Jaiswal
+  email: jaiswalaakashi123@gmail.com
+
+# Social links
+github_username: Aakashi06
+
+# Exclude files
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
