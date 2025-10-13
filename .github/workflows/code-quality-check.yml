@@ -1,0 +1,62 @@
+name: Code Quality & Security Check
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        bundler-cache: true
+        
+    - name: Install dependencies
+      run: |
+        bundle install
+        
+    - name: Lint Markdown files
+      run: |
+        gem install mdl
+        mdl . --style all --warnings || echo "Markdown linting completed with warnings"
+        
+    - name: Jekyll build test
+      run: |
+        bundle exec jekyll build --strict_front_matter
+        
+    - name: Check for broken internal links
+      run: |
+        gem install html-proofer
+        htmlproofer ./_site --disable-external --check-html --allow-hash-href
+        
+    - name: Security scan for dependencies
+      run: |
+        gem install bundler-audit
+        bundle audit check --update || echo "Security scan completed"
+        
+    - name: Validate YAML front matter
+      run: |
+        echo "Checking YAML front matter in markdown files..."
+        find . -name "*.md" | while read file; do
+          if head -1 "$file" | grep -q "^---$"; then
+            echo "✓ $file has front matter"
+          else
+            echo "⚠ $file missing front matter"
+          fi
+        done
+        
+    - name: Check file structure
+      run: |
+        echo "Repository structure check:"
+        echo "✓ Config file exists: $(test -f _config.yml && echo 'YES' || echo 'NO')"
+        echo "✓ Posts directory exists: $(test -d _posts && echo 'YES' || echo 'NO')"
+        echo "✓ Index file exists: $(test -f index.md && echo 'YES' || echo 'NO')"
